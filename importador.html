@@ -163,22 +163,7 @@ td{padding:8px 10px;border-top:1px solid var(--line-soft)}
 </head>
 <body>
 
-<section id="login" class="screen hidden">
-  <div class="brand">
-    <div class="ico"><svg width="84" height="84" viewBox="0 0 100 100" aria-hidden="true"><rect width="100" height="100" rx="22" fill="#1c1712"/><circle cx="50" cy="50" r="34" fill="#c9481a"/><path d="M50 16v68M16 50h68M27 25a34 34 0 0 1 0 50M73 25a34 34 0 0 0 0 50" fill="none" stroke="#1c1712" stroke-width="3"/><path d="M38 33h12a17 17 0 0 1 0 34H38z" fill="#fbf6ec" stroke="#1c1712" stroke-width="3" stroke-linejoin="round"/></svg></div>
-    <h1>DICA NBA<span>IMPORTADOR</span></h1>
-    <p>By: Ricardo Dionicio</p>
-  </div>
-  <form class="auth-box" id="login-form">
-    <div class="field"><label class="lbl" for="email">Correo electrónico</label><input class="input" type="email" id="email" placeholder="correo@ejemplo.com" autocomplete="email" required></div>
-    <div class="field" style="margin-bottom:20px"><label class="lbl" for="password">Contraseña</label><input class="input" type="password" id="password" placeholder="••••••••" autocomplete="current-password" required></div>
-    <button class="btn btn-primary" id="login-btn" type="submit">Entrar</button>
-    <p class="err hidden" id="login-error"></p>
-  </form>
-  <p style="font-size:12px;color:var(--muted);margin-top:18px">Usa las mismas credenciales de DICA NBA Analytics.</p>
-</section>
-
-<div id="app" class="hidden">
+<div id="app">
   <header class="topbar">
     <div class="topbar-in">
       <div class="wm"><svg width="36" height="36" viewBox="0 0 100 100" aria-hidden="true"><rect width="100" height="100" rx="22" fill="#1c1712"/><circle cx="50" cy="50" r="34" fill="#c9481a"/><path d="M50 16v68M16 50h68M27 25a34 34 0 0 1 0 50M73 25a34 34 0 0 0 0 50" fill="none" stroke="#1c1712" stroke-width="3"/><path d="M38 33h12a17 17 0 0 1 0 34H38z" fill="#fbf6ec" stroke="#1c1712" stroke-width="3" stroke-linejoin="round"/></svg><div>DICA NBA<small id="role-sub">Importador · By: Ricardo Dionicio</small></div></div>
@@ -193,7 +178,6 @@ td{padding:8px 10px;border-top:1px solid var(--line-soft)}
       <button class="mode" data-mode="player-stats"><i class="fa-solid fa-user-clock"></i>Stats de jugador</button>
       <button class="mode" data-mode="team-stats"><i class="fa-solid fa-chart-line"></i>Stats de equipo</button>
       <button class="mode" data-mode="partidos"><i class="fa-solid fa-calendar-day"></i>Partidos del día</button>
-      <button class="mode" data-mode="usuarios"><i class="fa-solid fa-hourglass-half"></i>Vencimientos</button>
       <button class="mode" data-mode="previo"><i class="fa-solid fa-clock-rotate-left"></i>Historial previo</button>
       <button class="mode" data-mode="lineas"><i class="fa-solid fa-list-ol"></i>Líneas del día</button>
     </div>
@@ -332,40 +316,32 @@ td{padding:8px 10px;border-top:1px solid var(--line-soft)}
 
     <!-- GUARDAR -->
     <div class="panel hidden" id="upload-card">
-      <div class="panel-h"><span class="n" id="n-up">5</span><h2>Guardar en Firebase</h2></div>
+      <div class="panel-h"><span class="n" id="n-up">5</span><h2>Guardar</h2></div>
       <label class="check hidden" id="replace-box"><input type="checkbox" id="replace"><span id="replace-label"></span></label>
       <button class="btn btn-primary" id="upload-btn"><span id="upload-text">Guardar</span></button>
       <div class="log hidden" id="upload-log"></div>
     </div>
+
+    <!-- COPIA DE SEGURIDAD -->
+    <div class="panel" id="backup-card">
+      <div class="panel-h"><span class="n"><i class="fa-solid fa-box-archive" style="font-size:17px"></i></span><div><h2>Copia de seguridad</h2><p>Los datos se guardan solo en este navegador. Descarga una copia para respaldarlos o para pasarlos a otro dispositivo.</p></div></div>
+      <button class="btn btn-blue" id="backup-export"><i class="fa-solid fa-download"></i> Descargar copia</button>
+      <button class="btn btn-ink" id="backup-import" style="margin-top:8px"><i class="fa-solid fa-upload"></i> Cargar copia</button>
+      <input type="file" id="backup-file" accept=".json,application/json" class="hidden">
+      <p class="small" id="backup-msg" style="margin-top:10px"></p>
+    </div>
   </div>
 </div>
 
+<script src="localdb.js"></script>
 <script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-import { getFirestore, doc, getDoc, setDoc, writeBatch, arrayUnion, Timestamp, collection, getDocs, deleteDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-
-// MISMA CONFIGURACIÓN QUE DICA_NBA.html (proyecto Firebase de NBA)
-const firebaseConfig = {
-  apiKey: "AIzaSyCVkgWnZa83EjXsLCMt9YxHVq6d6Nnrw7I",
-  authDomain: "dica-nba.firebaseapp.com",
-  projectId: "dica-nba",
-  storageBucket: "dica-nba.firebasestorage.app",
-  messagingSenderId: "224764762732",
-  appId: "1:224764762732:web:7042fe57c93275c0549649",
-  measurementId: "G-QBH1GF7Q1D"
-};
-const CONFIG_OK = !String(firebaseConfig.apiKey).startsWith('PEGA');
+const { db, doc, getDoc, setDoc, writeBatch, arrayUnion, Timestamp, collection, getDocs, deleteDoc, exportAll, importAll } = window.LocalDB;
 
 const $ = id => document.getElementById(id);
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const num = v => { if (v === '' || v == null) return null; const n = Number(v); return Number.isFinite(n) ? n : null; };
 function busy(btn, text) { btn.dataset.html = btn.dataset.html || btn.innerHTML; btn.disabled = true; btn.innerHTML = `<span class="spin"></span> ${text}`; }
 function idle(btn) { btn.disabled = false; btn.innerHTML = btn.dataset.html; }
-
-let auth = null, db = null;
-if (CONFIG_OK) { const a = initializeApp(firebaseConfig); auth = getAuth(a); db = getFirestore(a); }
-else { $('login-error').textContent = 'Falta pegar la configuración de Firebase en el archivo (busca "PEGA_AQUI").'; $('login-error').classList.remove('hidden'); }
 
 // ---------- Equipos NBA (ID de ESPN estable) ----------
 const NBA_TEAMS = [
@@ -483,28 +459,42 @@ function similarity(a, b) {
 }
 
 // ---------- Acceso libre ----------
-// Sin login: se abre una sesión anónima de Firebase para poder leer y escribir.
-let started = false;
+// Sin login. Los datos se guardan en la base local del navegador (localdb.js).
 async function startApp() {
-  if (started) return;
-  started = true;
-  ROLE = 'admin'; ME = 'importador';
-  $('app').classList.remove('hidden');
+  ROLE = 'admin'; ME = '';
   $('role-sub').textContent = 'Importador · By: Ricardo Dionicio';
   await loadTeams();
   applyMode();
 }
-if (CONFIG_OK) {
-  onAuthStateChanged(auth, async (user) => {
-    if (!user) {
-      try { await signInAnonymously(auth); return; }
-      catch (e) { console.warn('No se pudo abrir sesión anónima', e); }
-    }
-    startApp();
-  });
-} else {
-  $('login').classList.remove('hidden');
-}
+
+// ---------- Copia de seguridad ----------
+$('backup-export').addEventListener('click', async () => {
+  const btn = $('backup-export'); busy(btn, 'Preparando…');
+  try {
+    const data = await exportAll();
+    const url = URL.createObjectURL(new Blob([JSON.stringify(data)], { type: 'application/json' }));
+    const a = document.createElement('a');
+    a.href = url; a.download = `dica-nba-copia-${new Date().toISOString().slice(0, 10)}.json`;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 5000);
+    $('backup-msg').textContent = `Copia descargada: ${data.docs.length} registros.`;
+  } catch (e) { $('backup-msg').textContent = 'No se pudo descargar la copia: ' + (e.message || e); }
+  finally { idle(btn); }
+});
+$('backup-import').addEventListener('click', () => $('backup-file').click());
+$('backup-file').addEventListener('change', async (e) => {
+  const file = e.target.files[0]; e.target.value = '';
+  if (!file) return;
+  if (!confirm('Cargar esta copia reemplaza todos los datos guardados en este navegador. ¿Continuar?')) return;
+  const btn = $('backup-import'); busy(btn, 'Cargando…');
+  try {
+    const n = await importAll(JSON.parse(await file.text()), { replace: true });
+    $('backup-msg').textContent = `Copia cargada: ${n} registros.`;
+    teamList = {}; await startApp();
+  } catch (err) { $('backup-msg').textContent = 'No se pudo cargar la copia: ' + (err.message || err); }
+  finally { idle(btn); }
+});
+
 
 // ---------- Equipos (liga/equipos) ----------
 let teamList = {};
@@ -1671,6 +1661,8 @@ $('code-btn').addEventListener('click', async () => {
     hit ? codeLog(`El código ${esc(q)} es de: <b>${esc(hit)}</b>`) : codeLog(`Ningún usuario tiene el código ${esc(q)}.`, 'bad');
   } catch (e) { codeLog('No se pudo buscar: ' + esc(e.message), 'bad'); }
 });
+
+startApp();
 </script>
 </body>
 </html>

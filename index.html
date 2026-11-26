@@ -429,54 +429,8 @@ table.log td.hl{font-weight:800}
 </head>
 <body>
 
-<!-- ============ LOGIN ============ -->
-<section id="login" class="screen hidden">
-  <div class="court" aria-hidden="true">
-    <svg viewBox="0 0 400 300" preserveAspectRatio="xMidYMax slice" fill="none" stroke="rgba(28,23,18,.13)" stroke-width="2">
-      <rect x="140" y="170" width="120" height="130"/>
-      <circle cx="200" cy="170" r="60"/>
-      <path d="M40 300 V230 A160 160 0 0 1 360 230 V300"/>
-      <circle cx="200" cy="286" r="7"/>
-    </svg>
-  </div>
-  <div class="brand">
-    <svg width="96" height="96" viewBox="0 0 100 100" aria-hidden="true"><rect width="100" height="100" rx="22" fill="#1c1712"/><circle cx="50" cy="50" r="34" fill="#c9481a"/><path d="M50 16v68M16 50h68M27 25a34 34 0 0 1 0 50M73 25a34 34 0 0 0 0 50" fill="none" stroke="#1c1712" stroke-width="3"/><path d="M38 33h12a17 17 0 0 1 0 34H38z" fill="#fbf6ec" stroke="#1c1712" stroke-width="3" stroke-linejoin="round"/></svg>
-    <h1>DICA NBA</h1>
-    <p>By: Ricardo Dionicio</p>
-  </div>
-  <form class="auth-box" id="login-form" autocomplete="on">
-    <div class="field">
-      <label class="lbl" for="email">Correo electrónico</label>
-      <input class="input" type="email" id="email" placeholder="correo@ejemplo.com" autocomplete="email" required>
-    </div>
-    <div class="field" style="margin-bottom:20px">
-      <label class="lbl" for="password">Contraseña</label>
-      <input class="input" type="password" id="password" placeholder="••••••••" autocomplete="current-password" required>
-    </div>
-    <button class="btn btn-primary" id="login-btn" type="submit">ENTRAR</button>
-    <p class="err hidden" id="login-error"></p>
-  </form>
-  <div class="info-box">
-    <p>¿Todavía no tienes cuenta?</p>
-    <a class="btn btn-wa" id="info-link" target="_blank" rel="noopener"><i class="fa-brands fa-whatsapp"></i> PEDIR INFORMES</a>
-    <button class="linkish" id="login-back" type="button">Volver a la app</button>
-  </div>
-</section>
-
-<!-- ============ ACCESO VENCIDO ============ -->
-<section id="expired" class="screen hidden">
-  <div class="expired">
-    <div class="ico"><i class="fa-solid fa-lock" id="expired-ico"></i></div>
-    <h2 id="expired-title">TU ACCESO VENCIÓ</h2>
-    <p id="expired-text">Tu suscripción a DICA NBA terminó. Escríbeme para renovarla y seguir viendo las proyecciones de cada jornada.</p>
-    <a class="btn btn-wa" id="wa-link" target="_blank" rel="noopener"><i class="fa-brands fa-whatsapp"></i> Escribir por WhatsApp</a>
-    <p style="color:var(--muted);font-size:12px;margin-top:8px">+52 729 881 2937</p>
-    <button class="linkish" id="expired-logout">Cerrar sesión</button>
-  </div>
-</section>
-
 <!-- ============ APP ============ -->
-<div id="app" class="hidden">
+<div id="app">
   <div id="wm" aria-hidden="true"></div>
   <header class="topbar">
     <div class="topbar-in">
@@ -485,8 +439,6 @@ table.log td.hl{font-weight:800}
         <div><b>DICA NBA</b><small>By: Ricardo Dionicio</small></div>
       </div>
       <div class="tb-r">
-        <button class="viewbtn hidden" id="view-btn" aria-label="Cambiar entre vista de administrador y de usuario"><i class="fa-solid fa-eye"></i><span>Vista admin</span></button>
-        <button class="icon-btn" id="logout-btn" aria-label="Entrar como administrador"><i class="fa-solid fa-user-lock"></i></button>
       </div>
     </div>
   </header>
@@ -496,7 +448,6 @@ table.log td.hl{font-weight:800}
 
       <!-- TAB: EQUIPOS -->
       <section id="tab-stats">
-        <div id="admin-alert" class="admin-alert hidden"></div>
         <h2 class="h2">EQUIPOS</h2>
         <p class="sub">Promedios de la temporada y registro partido por partido.</p>
         <div class="field hidden">
@@ -699,23 +650,9 @@ table.log td.hl{font-weight:800}
   <button class="shm-close" id="share-close">Cerrar</button>
 </div>
 
+<script src="localdb.js"></script>
 <script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-import { getAuth, signInWithEmailAndPassword, signInAnonymously, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-import { getFirestore, doc, getDoc, setDoc, collection, getDocs, query, orderBy, limit, where } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-
-const firebaseConfig = {
-  apiKey: "AIzaSyCVkgWnZa83EjXsLCMt9YxHVq6d6Nnrw7I",
-  authDomain: "dica-nba.firebaseapp.com",
-  projectId: "dica-nba",
-  storageBucket: "dica-nba.firebasestorage.app",
-  messagingSenderId: "224764762732",
-  appId: "1:224764762732:web:7042fe57c93275c0549649",
-  measurementId: "G-QBH1GF7Q1D"
-};
-const CONFIG_OK = !String(firebaseConfig.apiKey).startsWith('PEGA');
-const WHATSAPP = '527298812937';
-
+const { db, doc, getDoc, setDoc, collection, getDocs, query, orderBy, limit, where } = window.LocalDB;
 const LEAGUE = { pts:114.5, pace:99.5, ortg:115.0, fga:88.5, fgm:41.5, fg3a:37.5, fg3m:13.5, fta:21.5, reb:44.0, oreb:10.5, ast:26.5, tov:14.0, stl:8.2, blk:5.0 };
 const LG_EXTRA = { ftm: 17.0, ptsSd: 11 };
 const Q1 = { share: 0.25, sdTeam: 6.3, sdTot: 9.2 };
@@ -781,19 +718,6 @@ const TEAM_COLORS = {
   UTA:['#3E2680','#FFFFFF'], WAS:['#002B5C','#E31837'],
 };
 const ABBR_ALIAS = { GS:'GSW', NO:'NOP', NY:'NYK', SA:'SAS', UTAH:'UTA', WSH:'WAS', PHO:'PHX', BRK:'BKN', CHO:'CHA' };
-
-let auth = null, db = null;
-if (CONFIG_OK) {
-  const fbApp = initializeApp(firebaseConfig);
-  auth = getAuth(fbApp);
-  db = getFirestore(fbApp);
-} else {
-  const e = $('login-error');
-  e.textContent = 'Falta pegar la configuración de Firebase en el archivo (busca "PEGA_AQUI").';
-  e.classList.remove('hidden');
-}
-$('wa-link').href = `https://wa.me/${WHATSAPP}`;
-$('info-link').href = `https://wa.me/${WHATSAPP}?text=${encodeURIComponent('Hola Ricardo, quiero informes de DICA NBA 🏀 ¿Cómo me suscribo y cuánto cuesta?')}`;
 
 const cache = { teams: [], teamMeta: {}, teamDocs: {}, rosters: {}, summaries: {}, jornadas: {} };
 async function getTeamDoc(id) {
@@ -872,150 +796,19 @@ function showTab(t) {
 }
 document.querySelectorAll('.tab').forEach(btn => btn.addEventListener('click', () => showTab(btn.dataset.tab)));
 
-// =========================================================
-// SEGURIDAD: límite de dispositivos + marca de agua
-// =========================================================
-const MAX_DEV = 2;
-function userCode(email) {
-  let h = 5381; for (const c of String(email).toLowerCase()) h = ((h * 33) ^ c.charCodeAt(0)) >>> 0;
-  return h.toString(36).toUpperCase().padStart(6, '0').slice(-6);
-}
-function maskEmail(e) {
-  const [u, d] = String(e).split('@'); if (!d) return e;
-  return (u.length <= 3 ? u[0] + '**' : u.slice(0, 3) + '***') + '@' + d;
-}
-function deviceName() {
-  const ua = navigator.userAgent;
-  const os = /iPhone/.test(ua) ? 'iPhone' : /iPad/.test(ua) ? 'iPad' : /Android/.test(ua) ? 'Android' : /Windows/.test(ua) ? 'Windows' : /Mac/.test(ua) ? 'Mac' : /Linux/.test(ua) ? 'Linux' : 'Otro';
-  const br = /Edg\//.test(ua) ? 'Edge' : /CriOS|Chrome\//.test(ua) ? 'Chrome' : /FxiOS|Firefox\//.test(ua) ? 'Firefox' : /Safari\//.test(ua) ? 'Safari' : 'Navegador';
-  return `${os} · ${br}`;
-}
-async function fingerprint() {
-  const raw = [navigator.userAgent, navigator.language, screen.width + 'x' + screen.height, screen.colorDepth, Intl.DateTimeFormat().resolvedOptions().timeZone, navigator.hardwareConcurrency || 0, navigator.maxTouchPoints || 0].join('|');
-  try { const b = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(raw)); return [...new Uint8Array(b)].slice(0, 8).map(x => x.toString(16).padStart(2, '0')).join(''); }
-  catch { let h = 0; for (const c of raw) h = (h * 31 + c.charCodeAt(0)) | 0; return String(h >>> 0); }
-}
 const lsGet = k => { try { return localStorage.getItem(k); } catch { return null; } };
 const lsSet = (k, v) => { try { localStorage.setItem(k, v); } catch {} };
 
-async function checkDevice(email) {
-  try {
-    const ref = doc(db, 'sesiones', email);
-    const snap = await getDoc(ref);
-    const devices = snap.exists() ? (snap.data().devices || {}) : {};
-    const fp = await fingerprint();
-    let id = lsGet('dica_dev');
-    if (!id || !devices[id]) {
-      const match = Object.keys(devices).find(k => devices[k].fp === fp);
-      if (match) id = match;
-      if (!id) id = (crypto.randomUUID ? crypto.randomUUID() : String(Date.now()) + Math.random()).replace(/-/g, '').slice(0, 16);
-      lsSet('dica_dev', id);
-    }
-    const now = new Date().toISOString();
-    if (devices[id]) {
-      if (Date.now() - Date.parse(devices[id].last || 0) > 12 * 3600 * 1000)
-        await setDoc(ref, { devices: { [id]: { ...devices[id], last: now } } }, { merge: true });
-      return true;
-    }
-    if (Object.keys(devices).length < MAX_DEV) {
-      await setDoc(ref, { devices: { [id]: { fp, name: deviceName(), first: now, last: now } } }, { merge: true });
-      return true;
-    }
-    const hoy = now.slice(0, 10);
-    try {
-      await setDoc(doc(db, 'alertas', `${email}_${id}_${hoy}`), {
-        correo: email, dispositivo: deviceName(), fecha: now,
-        registrados: Object.values(devices).map(d => d.name || 'Dispositivo')
-      });
-    } catch {}
-    return false;
-  } catch (e) {
-    console.warn('No se pudo verificar el dispositivo', e);
-    return true;
-  }
-}
-function applyWatermark(email) {
-  const t1 = 'DICA NBA · ' + maskEmail(email), t2 = 'ID ' + userCode(email);
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="300" height="190"><g transform="rotate(-28 150 95)" font-family="Archivo, Arial, sans-serif" fill="#1c1712" fill-opacity="0.1" text-anchor="middle"><text x="150" y="90" font-size="15" font-weight="700">${esc(t1)}</text><text x="150" y="110" font-size="13" font-weight="600">${esc(t2)}</text></g></svg>`;
-  $('wm').style.backgroundImage = `url("data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}")`;
-  $('wm').classList.remove('hidden');
-}
-async function loadAdminAlerts() {
-  try {
-    const snap = await getDocs(collection(db, 'alertas'));
-    const n = snap.size;
-    const box = $('admin-alert');
-    if (!n) { box.classList.add('hidden'); return; }
-    box.innerHTML = `<i class="fa-solid fa-triangle-exclamation"></i><span>${n} ${n === 1 ? 'alerta' : 'alertas'} de dispositivos: alguien intentó entrar desde un dispositivo extra. Revísalo en el importador, modo Vencimientos.</span>`;
-    box.classList.remove('hidden');
-  } catch (e) { console.warn(e); }
-}
-
-function show(which) {
-  $('login').classList.toggle('hidden', which !== 'login');
-  $('expired').classList.toggle('hidden', which !== 'expired');
-  $('app').classList.toggle('hidden', which !== 'app');
-}
-// Acceso libre: cualquiera entra como usuario normal (con sesión anónima de
-// Firebase para poder leer la base). El login con correo es solo para admin
-// y capturistas, desde el botón de la barra superior.
-let booted = false, hasAccount = false;
+// Acceso libre: sin login, todos tienen las funciones de administrador.
+// Los datos se guardan en la base local del navegador (localdb.js).
 async function bootApp() {
-  if (booted) return;
-  booted = true;
-  realAdmin = isAdmin;
-  $('view-btn').classList.toggle('hidden', !realAdmin);
-  $('picks-generate').classList.toggle('hidden', !isAdmin);
-  const lb = $('logout-btn');
-  lb.setAttribute('aria-label', hasAccount ? 'Cerrar sesión' : 'Entrar como administrador');
-  lb.querySelector('i').className = hasAccount ? 'fa-solid fa-power-off' : 'fa-solid fa-user-lock';
+  isAdmin = true;
+  $('picks-generate').classList.remove('hidden');
   updateAiBoxUI();
   applyQ1Tab();
-  show('app');
   await Promise.all([loadTeams(), loadLeagueAvgs()]);
   loadIndice();
 }
-if (CONFIG_OK) {
-  onAuthStateChanged(auth, async (user) => {
-    if (!user) {
-      try { await signInAnonymously(auth); return; }
-      catch (e) { console.warn('No se pudo abrir sesión anónima', e); }
-    }
-    isAdmin = false; isCapt = false; ME = ''; hasAccount = false;
-    if (user && !user.isAnonymous) {
-      const email = (user.email || '').toLowerCase();
-      hasAccount = true; ME = email;
-      try { isAdmin = (await getDoc(doc(db, 'admins_importador', email))).exists(); } catch { isAdmin = false; }
-      if (!isAdmin) { try { isCapt = (await getDoc(doc(db, 'capturistas', email))).exists(); } catch { isCapt = false; } }
-    }
-    $('wm').classList.add('hidden');
-    if (isAdmin) loadAdminAlerts();
-    if (booted) { location.reload(); return; }
-    bootApp();
-  });
-} else {
-  bootApp();
-}
-$('login-form').addEventListener('submit', async (e) => {
-  e.preventDefault();
-  if (!CONFIG_OK) return;
-  const btn = $('login-btn');
-  busy(btn, 'ENTRANDO…');
-  try {
-    await signInWithEmailAndPassword(auth, $('email').value.trim(), $('password').value);
-    $('login-error').classList.add('hidden');
-  } catch (err) {
-    $('login-error').textContent = 'Correo o contraseña incorrectos.';
-    $('login-error').classList.remove('hidden');
-    idle(btn);
-  }
-});
-$('login-back').addEventListener('click', () => show('app'));
-$('logout-btn').addEventListener('click', () => {
-  if (hasAccount) signOut(auth);
-  else { $('login-error').classList.add('hidden'); show('login'); }
-});
-$('expired-logout').addEventListener('click', () => signOut(auth));
 
 // ---------- Promedios reales de la liga ----------
 async function loadLeagueAvgs() {
@@ -3672,28 +3465,9 @@ function renderPlayerProj() {
 // =========================================================
 // TAB PICKS
 // =========================================================
-let isAdmin = false, realAdmin = false, ME = '', isCapt = false;
+let isAdmin = true, ME = '', isCapt = false;
 const canCap = () => isAdmin || isCapt;
 
-$('view-btn').addEventListener('click', () => {
-  if (!realAdmin) return;
-  isAdmin = !isAdmin;
-  const b = $('view-btn'); b.classList.toggle('user', !isAdmin);
-  b.querySelector('span').textContent = isAdmin ? 'Vista admin' : 'Vista usuario';
-  if (isAdmin) { $('wm').classList.add('hidden'); loadAdminAlerts(); } else { applyWatermark(ME); $('admin-alert').classList.add('hidden'); }
-  $('picks-generate').classList.toggle('hidden', !isAdmin);
-  $('res-grade').classList.toggle('hidden', !isAdmin);
-  $('pub-modal').classList.add('hidden');
-  updateAiBoxUI();
-  if (vegasSel && $('vegas-out').innerHTML) { const [l, a] = vegasSel.split('|'); runVegas(l, a); }
-  if (jug.proj && $('jug-proj-out').innerHTML) renderPlayerProj();
-  if (J.fecha in LINES) renderLines();
-  if (currentPicks.length) renderPicks();
-  if (resLoaded) renderResultados();
-  applyQ1Tab();
-  if (currentTab === 'q1') { renderQ1(); loadQ1Rec(true); }
-  if (currentTab === 'q1' && J.fecha in LINES) { renderQ1(); renderQ1Rec(); }
-});
 let currentPicks = [], picksFilter = 'all', picksLoadedFor = null;
 
 async function loadPicks(force) {
@@ -3950,6 +3724,8 @@ $('picks-generate').addEventListener('click', async () => {
     $('picks-out').innerHTML = noteHTML('Error al generar los picks: ' + esc(err.message || ''), 'bad');
   } finally { idle(btn); }
 });
+
+bootApp();
 </script>
 </body>
 </html>
