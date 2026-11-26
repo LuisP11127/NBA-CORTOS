@@ -430,7 +430,7 @@ table.log td.hl{font-weight:800}
 <body>
 
 <!-- ============ LOGIN ============ -->
-<section id="login" class="screen">
+<section id="login" class="screen hidden">
   <div class="court" aria-hidden="true">
     <svg viewBox="0 0 400 300" preserveAspectRatio="xMidYMax slice" fill="none" stroke="rgba(28,23,18,.13)" stroke-width="2">
       <rect x="140" y="170" width="120" height="130"/>
@@ -459,6 +459,7 @@ table.log td.hl{font-weight:800}
   <div class="info-box">
     <p>¿Todavía no tienes cuenta?</p>
     <a class="btn btn-wa" id="info-link" target="_blank" rel="noopener"><i class="fa-brands fa-whatsapp"></i> PEDIR INFORMES</a>
+    <button class="linkish" id="login-back" type="button">Volver a la app</button>
   </div>
 </section>
 
@@ -485,7 +486,7 @@ table.log td.hl{font-weight:800}
       </div>
       <div class="tb-r">
         <button class="viewbtn hidden" id="view-btn" aria-label="Cambiar entre vista de administrador y de usuario"><i class="fa-solid fa-eye"></i><span>Vista admin</span></button>
-        <button class="icon-btn" id="logout-btn" aria-label="Cerrar sesión"><i class="fa-solid fa-power-off"></i></button>
+        <button class="icon-btn" id="logout-btn" aria-label="Entrar como administrador"><i class="fa-solid fa-user-lock"></i></button>
       </div>
     </div>
   </header>
@@ -700,7 +701,7 @@ table.log td.hl{font-weight:800}
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+import { getAuth, signInWithEmailAndPassword, signInAnonymously, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
 import { getFirestore, doc, getDoc, setDoc, collection, getDocs, query, orderBy, limit, where } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
 const firebaseConfig = {
@@ -955,49 +956,45 @@ function show(which) {
   $('expired').classList.toggle('hidden', which !== 'expired');
   $('app').classList.toggle('hidden', which !== 'app');
 }
+// Acceso libre: cualquiera entra como usuario normal (con sesión anónima de
+// Firebase para poder leer la base). El login con correo es solo para admin
+// y capturistas, desde el botón de la barra superior.
+let booted = false, hasAccount = false;
+async function bootApp() {
+  if (booted) return;
+  booted = true;
+  realAdmin = isAdmin;
+  $('view-btn').classList.toggle('hidden', !realAdmin);
+  $('picks-generate').classList.toggle('hidden', !isAdmin);
+  const lb = $('logout-btn');
+  lb.setAttribute('aria-label', hasAccount ? 'Cerrar sesión' : 'Entrar como administrador');
+  lb.querySelector('i').className = hasAccount ? 'fa-solid fa-power-off' : 'fa-solid fa-user-lock';
+  updateAiBoxUI();
+  applyQ1Tab();
+  show('app');
+  await Promise.all([loadTeams(), loadLeagueAvgs()]);
+  loadIndice();
+}
 if (CONFIG_OK) {
   onAuthStateChanged(auth, async (user) => {
-    if (!user) { show('login'); return; }
-    const email = (user.email || '').toLowerCase();
-    try { isAdmin = (await getDoc(doc(db, 'admins_importador', email))).exists(); } catch { isAdmin = false; }
-    isCapt = false;
-    if (!isAdmin) { try { isCapt = (await getDoc(doc(db, 'capturistas', email))).exists(); } catch { isCapt = false; } }
-    if (!isAdmin) {
-      let vence = isCapt ? '9999-12-31' : null;
-      if (!isCapt) try {
-        const acc = await getDoc(doc(db, 'acceso_usuarios', email));
-        vence = acc.exists() ? acc.data().vence : null;
-      } catch (e) { console.error('Error revisando acceso:', e); }
-      const hoy = new Date().toLocaleDateString('en-CA', { timeZone: 'America/Mexico_City' });
-      if (!vence || vence < hoy) {
-        $('expired-title').textContent = vence ? 'TU ACCESO VENCIÓ' : 'SIN ACCESO ACTIVO';
-        $('expired-text').textContent = vence
-          ? 'Tu suscripción a DICA NBA terminó. Escríbeme para renovarla y seguir viendo las proyecciones de cada jornada.'
-          : 'Tu cuenta todavía no tiene una suscripción activa a DICA NBA. Escríbeme para activarla.';
-        show('expired');
-        return;
-      }
-      if (!(await checkDevice(email))) {
-        $('expired-ico').className = 'fa-solid fa-mobile-screen-button';
-        $('expired-title').textContent = 'LÍMITE DE DISPOSITIVOS';
-        $('expired-text').textContent = `Tu cuenta ya está activa en ${MAX_DEV} dispositivos. Si cambiaste de celular o computadora, escríbeme y libero tu acceso.`;
-        show('expired');
-        return;
-      }
-      applyWatermark(email);
-    } else {
-      $('wm').classList.add('hidden');
-      loadAdminAlerts();
+    if (!user) {
+      try { await signInAnonymously(auth); return; }
+      catch (e) { console.warn('No se pudo abrir sesión anónima', e); }
     }
-    realAdmin = isAdmin; ME = email;
-    $('view-btn').classList.toggle('hidden', !realAdmin);
-    $('picks-generate').classList.toggle('hidden', !isAdmin);
-    updateAiBoxUI();
-    applyQ1Tab();
-    show('app');
-    await Promise.all([loadTeams(), loadLeagueAvgs()]);
-    loadIndice();
+    isAdmin = false; isCapt = false; ME = ''; hasAccount = false;
+    if (user && !user.isAnonymous) {
+      const email = (user.email || '').toLowerCase();
+      hasAccount = true; ME = email;
+      try { isAdmin = (await getDoc(doc(db, 'admins_importador', email))).exists(); } catch { isAdmin = false; }
+      if (!isAdmin) { try { isCapt = (await getDoc(doc(db, 'capturistas', email))).exists(); } catch { isCapt = false; } }
+    }
+    $('wm').classList.add('hidden');
+    if (isAdmin) loadAdminAlerts();
+    if (booted) { location.reload(); return; }
+    bootApp();
   });
+} else {
+  bootApp();
 }
 $('login-form').addEventListener('submit', async (e) => {
   e.preventDefault();
@@ -1010,9 +1007,14 @@ $('login-form').addEventListener('submit', async (e) => {
   } catch (err) {
     $('login-error').textContent = 'Correo o contraseña incorrectos.';
     $('login-error').classList.remove('hidden');
-  } finally { idle(btn); }
+    idle(btn);
+  }
 });
-$('logout-btn').addEventListener('click', () => signOut(auth));
+$('login-back').addEventListener('click', () => show('app'));
+$('logout-btn').addEventListener('click', () => {
+  if (hasAccount) signOut(auth);
+  else { $('login-error').classList.add('hidden'); show('login'); }
+});
 $('expired-logout').addEventListener('click', () => signOut(auth));
 
 // ---------- Promedios reales de la liga ----------
