@@ -166,7 +166,7 @@ td{padding:8px 10px;border-top:1px solid var(--line-soft)}
 <div id="app">
   <header class="topbar">
     <div class="topbar-in">
-      <div class="wm"><svg width="36" height="36" viewBox="0 0 100 100" aria-hidden="true"><rect width="100" height="100" rx="22" fill="#1c1712"/><circle cx="50" cy="50" r="34" fill="#c9481a"/><path d="M50 16v68M16 50h68M27 25a34 34 0 0 1 0 50M73 25a34 34 0 0 0 0 50" fill="none" stroke="#1c1712" stroke-width="3"/><circle cx="50" cy="50" r="21" fill="#fbf6ec" stroke="#1c1712" stroke-width="3"/><path d="M60.3 39.7A14.5 14.5 0 1 0 60.3 60.3L55.3 55.3A7.5 7.5 0 1 1 55.3 44.7Z" fill="#c9481a" stroke="#1c1712" stroke-width="2.5" stroke-linejoin="round"/></svg><div>NBA CORTOS<small id="role-sub">Importador · By: Ricardo Dionicio</small></div></div>
+      <div class="wm"><svg width="36" height="36" viewBox="0 0 100 100" aria-hidden="true"><rect width="100" height="100" rx="22" fill="#1c1712"/><g transform="translate(0 -1)"><rect x="44" y="11" width="12" height="7" rx="2" fill="#fbf6ec"/><rect x="47.5" y="17" width="5" height="6" fill="#fbf6ec"/><rect x="73" y="21" width="9" height="6" rx="2" fill="#fbf6ec" transform="rotate(45 77.5 24)"/><circle cx="50" cy="57" r="34.5" fill="none" stroke="#fbf6ec" stroke-width="3.5"/><circle cx="50" cy="57" r="30" fill="#c9481a"/><path d="M50 57V27A30 30 0 0 1 80 57Z" fill="#fbf6ec"/><path d="M50 27v60M20 57h60M29.8 35a30 30 0 0 1 0 44M70.2 35a30 30 0 0 0 0 44" fill="none" stroke="#1c1712" stroke-width="3"/><circle cx="50" cy="57" r="3.2" fill="#1c1712"/></g></svg><div>NBA CORTOS<small id="role-sub">Importador</small></div></div>
       
     </div>
   </header>
@@ -462,7 +462,7 @@ function similarity(a, b) {
 // Sin login. Los datos se guardan en la base local del navegador (localdb.js).
 async function startApp() {
   ROLE = 'admin'; ME = '';
-  $('role-sub').textContent = 'Importador · By: Ricardo Dionicio';
+  $('role-sub').textContent = 'Importador';
   await loadTeams();
   applyMode();
 }
@@ -513,7 +513,7 @@ const tName = id => teamList[id]?.nombre || id, tAb = id => teamList[id]?.abrev 
 async function initLines() {
   const sel = $('ln-fecha');
   if (!Object.keys(teamList).length) { try { const t = await getDoc(doc(db, 'liga', 'equipos')); teamList = t.exists() ? (t.data().lista || {}) : {}; } catch (e) { console.warn(e); } }
-  $('ln-next').innerHTML = ROLE === 'capturista' ? 'Cuando termines, avísale a Ricardo que las líneas ya están.'
+  $('ln-next').innerHTML = ROLE === 'capturista' ? 'Cuando termines, avisa que las líneas ya están.'
     : 'Después de guardar, entra a la app &gt; Picks &gt; <b>GENERAR PICKS DE ESTA JORNADA</b> (o en la pestaña 1er Q &gt; <b>CALCULAR 1ER CUARTO</b>): ahí se calculan las recomendaciones con las líneas que pusiste.';
   try {
     const s = await getDoc(doc(db, 'liga', 'indice'));
@@ -633,7 +633,7 @@ $('ln-save').addEventListener('click', async () => {
     LN.existing = list;
     const n = list.reduce((a, m) => a + (m.opts || []).length, 0);
     log(`Listo: ${list.length} mercados (${n} líneas) guardados para ${fechaTxt(fecha)}.`, 'ok');
-    log(ROLE === 'capturista' ? 'Avísale a Ricardo que ya quedaron.' : 'Ahora abre la app > Picks > GENERAR PICKS DE ESTA JORNADA para calcular las recomendaciones.', 'info');
+    log(ROLE === 'capturista' ? 'Avisa que ya quedaron.' : 'Ahora abre la app > Picks > GENERAR PICKS DE ESTA JORNADA para calcular las recomendaciones.', 'info');
   } catch (e) { console.error(e); log('No se guardó: ' + (e.message || e), 'bad'); }
   finally { idle(btn); lnCount(); }
 });

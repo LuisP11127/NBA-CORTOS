@@ -4,8 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#1c1712">
-<title>NBA CORTOS · By: Ricardo Dionicio</title>
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%231c1712'/%3E%3Cg%3E%3Ccircle cx='50' cy='50' r='34' fill='%23c9481a'/%3E%3Cpath d='M50 16v68M16 50h68M27 25a34 34 0 0 1 0 50M73 25a34 34 0 0 0 0 50' fill='none' stroke='%231c1712' stroke-width='3'/%3E%3Ccircle cx='50' cy='50' r='21' fill='%23fbf6ec' stroke='%231c1712' stroke-width='3'/%3E%3Cpath d='M60.3 39.7A14.5 14.5 0 1 0 60.3 60.3L55.3 55.3A7.5 7.5 0 1 1 55.3 44.7Z' fill='%23c9481a' stroke='%231c1712' stroke-width='2.5' stroke-linejoin='round'/%3E%3C/g%3E%3C/svg%3E">
+<title>NBA CORTOS</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%231c1712'/%3E%3Cg transform='translate(0 -1)'%3E%3Crect x='44' y='11' width='12' height='7' rx='2' fill='%23fbf6ec'/%3E%3Crect x='47.5' y='17' width='5' height='6' fill='%23fbf6ec'/%3E%3Crect x='73' y='21' width='9' height='6' rx='2' fill='%23fbf6ec' transform='rotate(45 77.5 24)'/%3E%3Ccircle cx='50' cy='57' r='34.5' fill='none' stroke='%23fbf6ec' stroke-width='3.5'/%3E%3Ccircle cx='50' cy='57' r='30' fill='%23c9481a'/%3E%3Cpath d='M50 57V27A30 30 0 0 1 80 57Z' fill='%23fbf6ec'/%3E%3Cpath d='M50 27v60M20 57h60M29.8 35a30 30 0 0 1 0 44M70.2 35a30 30 0 0 0 0 44' fill='none' stroke='%231c1712' stroke-width='3'/%3E%3Ccircle cx='50' cy='57' r='3.2' fill='%231c1712'/%3E%3C/g%3E%3C/svg%3E">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="manifest" href="manifest.json">
 <meta name="apple-mobile-web-app-title" content="NBA CORTOS">
@@ -435,8 +435,8 @@ table.log td.hl{font-weight:800}
   <header class="topbar">
     <div class="topbar-in">
       <div class="wm">
-        <svg width="38" height="38" viewBox="0 0 100 100" aria-hidden="true"><rect width="100" height="100" rx="22" fill="#1c1712"/><circle cx="50" cy="50" r="34" fill="#c9481a"/><path d="M50 16v68M16 50h68M27 25a34 34 0 0 1 0 50M73 25a34 34 0 0 0 0 50" fill="none" stroke="#1c1712" stroke-width="3"/><circle cx="50" cy="50" r="21" fill="#fbf6ec" stroke="#1c1712" stroke-width="3"/><path d="M60.3 39.7A14.5 14.5 0 1 0 60.3 60.3L55.3 55.3A7.5 7.5 0 1 1 55.3 44.7Z" fill="#c9481a" stroke="#1c1712" stroke-width="2.5" stroke-linejoin="round"/></svg>
-        <div><b>NBA CORTOS</b><small>By: Ricardo Dionicio</small></div>
+        <svg width="38" height="38" viewBox="0 0 100 100" aria-hidden="true"><rect width="100" height="100" rx="22" fill="#1c1712"/><g transform="translate(0 -1)"><rect x="44" y="11" width="12" height="7" rx="2" fill="#fbf6ec"/><rect x="47.5" y="17" width="5" height="6" fill="#fbf6ec"/><rect x="73" y="21" width="9" height="6" rx="2" fill="#fbf6ec" transform="rotate(45 77.5 24)"/><circle cx="50" cy="57" r="34.5" fill="none" stroke="#fbf6ec" stroke-width="3.5"/><circle cx="50" cy="57" r="30" fill="#c9481a"/><path d="M50 57V27A30 30 0 0 1 80 57Z" fill="#fbf6ec"/><path d="M50 27v60M20 57h60M29.8 35a30 30 0 0 1 0 44M70.2 35a30 30 0 0 0 0 44" fill="none" stroke="#1c1712" stroke-width="3"/><circle cx="50" cy="57" r="3.2" fill="#1c1712"/></g></svg>
+        <div><b>NBA CORTOS</b></div>
       </div>
       <div class="tb-r">
       </div>
@@ -1141,16 +1141,20 @@ function txt(ctx, t, x, y, { font, color = C.ink, align = 'left', max = 0, base 
   ctx.fillText(t, x, y);
 }
 function drawLogo(ctx, x, y, s) {
+  // Cronómetro-balón con el primer cuarto resaltado (mismo dibujo que el favicon).
   const k = s / 100; ctx.save(); ctx.translate(x, y); ctx.scale(k, k);
   rr(ctx, 0, 0, 100, 100, 22); ctx.fillStyle = C.ink; ctx.fill();
-  ctx.beginPath(); ctx.arc(50, 50, 34, 0, Math.PI * 2); ctx.fillStyle = C.orange; ctx.fill();
+  ctx.translate(0, -1); ctx.fillStyle = C.paper;
+  rr(ctx, 44, 11, 12, 7, 2); ctx.fill();
+  ctx.fillRect(47.5, 17, 5, 6);
+  ctx.save(); ctx.translate(77.5, 24); ctx.rotate(Math.PI / 4); rr(ctx, -4.5, -3, 9, 6, 2); ctx.fill(); ctx.restore();
+  ctx.beginPath(); ctx.arc(50, 57, 34.5, 0, Math.PI * 2); ctx.strokeStyle = C.paper; ctx.lineWidth = 3.5; ctx.stroke();
+  ctx.beginPath(); ctx.arc(50, 57, 30, 0, Math.PI * 2); ctx.fillStyle = C.orange; ctx.fill();
+  ctx.fillStyle = C.paper; ctx.fill(new Path2D('M50 57V27A30 30 0 0 1 80 57Z'));
   ctx.strokeStyle = C.ink; ctx.lineWidth = 3;
-  ctx.beginPath(); ctx.moveTo(50, 16); ctx.lineTo(50, 84); ctx.moveTo(16, 50); ctx.lineTo(84, 50); ctx.stroke();
-  ctx.beginPath(); ctx.arc(-7, 50, 41.6, -0.64, 0.64); ctx.stroke();
-  ctx.beginPath(); ctx.arc(107, 50, 41.6, Math.PI - 0.64, Math.PI + 0.64); ctx.stroke();
-  ctx.beginPath(); ctx.arc(50, 50, 21, 0, Math.PI * 2); ctx.fillStyle = C.paper; ctx.fill(); ctx.stroke();
-  const letra = new Path2D('M60.3 39.7A14.5 14.5 0 1 0 60.3 60.3L55.3 55.3A7.5 7.5 0 1 1 55.3 44.7Z');
-  ctx.lineWidth = 2.5; ctx.lineJoin = 'round'; ctx.fillStyle = C.orange; ctx.fill(letra); ctx.stroke(letra); ctx.restore();
+  ctx.stroke(new Path2D('M50 27v60M20 57h60M29.8 35a30 30 0 0 1 0 44M70.2 35a30 30 0 0 0 0 44'));
+  ctx.beginPath(); ctx.arc(50, 57, 3.2, 0, Math.PI * 2); ctx.fillStyle = C.ink; ctx.fill();
+  ctx.restore();
 }
 function drawTile(ctx, id, x, y, s) {
   const c = teamColors(id);
@@ -1174,8 +1178,7 @@ function drawFrame(ctx, W, H, dateTxt) {
   ctx.strokeRect(W / 2 - 160, H - 380, 320, 400);
   ctx.fillStyle = C.paper; ctx.fillRect(0, 0, W, 150); ctx.fillStyle = C.orange; ctx.fillRect(0, 150, W, 10);
   drawLogo(ctx, 56, 30, 92);
-  txt(ctx, 'NBA CORTOS', 170, 92, { font: `64px ${FD}` });
-  txt(ctx, 'By: Ricardo Dionicio', 172, 128, { font: `600 26px ${FB}`, color: C.muted });
+  txt(ctx, 'NBA CORTOS', 170, 100, { font: `64px ${FD}` });
   if (dateTxt) txt(ctx, dateTxt, W - 56, 105, { font: `600 28px ${FB}`, color: C.muted, align: 'right', max: 360 });
 }
 function drawFooter(ctx, W, H) {
@@ -3586,7 +3589,6 @@ async function buildShareImages(g, picks) {
     // pie
     ctx.fillStyle = '#1c1712'; ctx.fillRect(0, SHI.H - 90, SHI.W, 90);
     ctx.fillStyle = '#c9481a'; ctx.font = '40px Anton, Impact, sans-serif'; ctx.fillText('NBA CORTOS', 50, SHI.H - 32);
-    ctx.textAlign = 'right'; ctx.fillStyle = '#c9b89c'; ctx.font = '600 24px Archivo, sans-serif'; ctx.fillText('By: Ricardo Dionicio', SHI.W - 50, SHI.H - 36); ctx.textAlign = 'left';
     out.push(cv);
   }
   return out;
