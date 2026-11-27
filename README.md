@@ -1,6 +1,6 @@
 # NBA-CORTOS
 
-DICA NBA: proyecciones y picks de la NBA. Son páginas estáticas, sin login ni servidor.
+NBA CORTOS: proyecciones y picks de la NBA. Son páginas estáticas, sin login ni servidor.
 
 - `index.html`: la app (equipos, Vegas 2.0, jugadores, picks, 1er cuarto, resultados). Todos tienen las funciones de administrador.
 - `importador.html`: carga equipos, rosters, estadísticas, partidos y líneas desde ESPN o desde archivos CSV/Excel.

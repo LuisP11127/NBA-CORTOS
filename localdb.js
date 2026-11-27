@@ -1,4 +1,4 @@
-// Base de datos local de DICA NBA.
+// Base de datos local de NBA CORTOS.
 // Reemplaza a Firestore con las mismas funciones que usaban index.html e
 // importador.html, pero guarda todo en IndexedDB, dentro del navegador.
 // Los datos viven solo en este navegador y dispositivo: la app y el importador
@@ -169,7 +169,7 @@
     return { app: 'dica-nba', version: 1, exportado: new Date().toISOString(), docs: recs };
   }
   async function importAll(payload, { replace = false } = {}) {
-    if (!payload || !Array.isArray(payload.docs)) throw new Error('El archivo no es una copia de DICA NBA.');
+    if (!payload || !Array.isArray(payload.docs)) throw new Error('El archivo no es una copia de NBA CORTOS.');
     const ops = [];
     if (replace) {
       const idb = await openIdb();
